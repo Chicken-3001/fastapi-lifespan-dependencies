@@ -9,11 +9,13 @@ readme = "README.md"
 python = "^3.12"
 fastapi = "^0.110.0"
 
-
 [tool.poetry.group.dev.dependencies]
 ruff = "^0.3.4"
 mypy = "^1.9.0"
 uvicorn = "^0.29.0"
+
+[tool.ruff.lint]
+select = ["E", "F", "UP"]
 
 [build-system]
 requires = ["poetry-core"]
