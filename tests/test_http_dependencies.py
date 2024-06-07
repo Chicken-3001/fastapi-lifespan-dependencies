@@ -5,33 +5,7 @@ from fastapi import Depends, FastAPI
 from fastapi.testclient import TestClient
 import pytest
 
-from fastapi_lifespan_dependencies import Lifespan
-
-
-lifespan = Lifespan()
-
-
-async def dependency() -> AsyncIterator[int]:
-    yield 0
-
-
-@lifespan.register
-async def lifespan_dependency() -> AsyncIterator[int]:
-    yield 1
-
-
-@lifespan.register
-async def dependent(
-    dep: Annotated[int, Depends(dependency)],
-) -> AsyncIterator[int]:
-    yield dep
-
-
-@lifespan.register
-async def lifespan_dependent(
-    dep: Annotated[int, Depends(lifespan_dependency)],
-) -> AsyncIterator[int]:
-    yield dep
+from .dependencies import lifespan, lifespan_dependency, dependent, lifespan_dependent
 
 
 app = FastAPI(lifespan=lifespan)
