@@ -5,7 +5,13 @@ from fastapi import Depends, FastAPI
 from fastapi.testclient import TestClient
 import pytest
 
-from .dependencies import lifespan, lifespan_dependency, dependent, lifespan_dependent
+from .dependencies import (
+    lifespan,
+    lifespan_dependency,
+    dependent,
+    lifespan_dependent,
+    sync_lifespan_dependency,
+)
 
 
 app = FastAPI(lifespan=lifespan)
@@ -14,6 +20,14 @@ app = FastAPI(lifespan=lifespan)
 @app.get("/lifespan_dependency")
 async def get_lifespan_dependency(
     value: Annotated[int, Depends(lifespan_dependency)],
+) -> int:
+    print(value)
+    return value
+
+
+@app.get("/sync_lifespan_dependency")
+async def get_sync_lifespan_dependency(
+    value: Annotated[int, Depends(sync_lifespan_dependency)],
 ) -> int:
     return value
 
@@ -40,6 +54,12 @@ async def test_lifespan_dependency(client: TestClient) -> None:
     response = client.get("/lifespan_dependency")
 
     assert response.json() == 1
+
+
+async def test_sync_lifespan_dependency(client: TestClient) -> None:
+    response = client.get("/sync_lifespan_dependency")
+
+    assert response.json() == 2
 
 
 async def test_dependent(client: TestClient) -> None:

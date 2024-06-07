@@ -2,7 +2,7 @@ from collections.abc import AsyncIterator
 from typing import Annotated
 
 from fastapi import Depends
-from fastapi_lifespan_dependencies.lifespan import Lifespan
+from fastapi_lifespan_dependencies import Lifespan
 
 
 lifespan = Lifespan()
@@ -18,6 +18,11 @@ async def lifespan_dependency() -> AsyncIterator[int]:
 
 
 @lifespan.register
+async def sync_lifespan_dependency() -> AsyncIterator[int]:
+    yield 2
+
+
+@lifespan.register
 async def dependent(
     value: Annotated[int, Depends(dependency)],
 ) -> AsyncIterator[int]:
@@ -29,3 +34,6 @@ async def lifespan_dependent(
     value: Annotated[int, Depends(lifespan_dependency)],
 ) -> AsyncIterator[int]:
     yield value
+
+
+# TODO: Test async/sync dependency chains?

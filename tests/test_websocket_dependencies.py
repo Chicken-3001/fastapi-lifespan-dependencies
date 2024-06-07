@@ -5,7 +5,13 @@ from fastapi import Depends, FastAPI, WebSocket
 from fastapi.testclient import TestClient
 import pytest
 
-from .dependencies import lifespan, lifespan_dependency, dependent, lifespan_dependent
+from .dependencies import (
+    lifespan,
+    lifespan_dependency,
+    dependent,
+    lifespan_dependent,
+    sync_lifespan_dependency,
+)
 
 
 app = FastAPI(lifespan=lifespan)
@@ -15,6 +21,15 @@ app = FastAPI(lifespan=lifespan)
 async def get_lifespan_dependency(
     websocket: WebSocket,
     value: Annotated[int, Depends(lifespan_dependency)],
+) -> None:
+    await websocket.accept()
+    await websocket.send_json(value)
+
+
+@app.websocket("/sync_lifespan_dependency")
+async def get_sync_lifespan_dependency(
+    websocket: WebSocket,
+    value: Annotated[int, Depends(sync_lifespan_dependency)],
 ) -> None:
     await websocket.accept()
     await websocket.send_json(value)
@@ -46,6 +61,11 @@ async def client() -> AsyncIterator[TestClient]:
 async def test_lifespan_dependency(client: TestClient) -> None:
     with client.websocket_connect("/lifespan_dependency") as websocket:
         assert websocket.receive_json() == 1
+
+
+async def test_sync_lifespan_dependency(client: TestClient) -> None:
+    with client.websocket_connect("/sync_lifespan_dependency") as websocket:
+        assert websocket.receive_json() == 2
 
 
 async def test_dependent(client: TestClient) -> None:
