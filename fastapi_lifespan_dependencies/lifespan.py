@@ -3,8 +3,9 @@ from typing import Any, AsyncIterator, Callable, Mapping
 
 from fastapi import FastAPI
 from fastapi.dependencies.utils import get_dependant, solve_dependencies
-from fastapi.exceptions import ValidationException
 from starlette.requests import HTTPConnection, Request
+
+from fastapi_lifespan_dependencies.exceptions import LifespanDependencyError
 
 LifespanDependency = Callable[..., AbstractAsyncContextManager[Any]]
 
@@ -29,16 +30,26 @@ class Lifespan:
                     }
                 )
 
-                # FIXME: the `background_tasks`, `response`, `dependency_cache`
-                # return values are currently ignored.
-                solved_values, errors, *_ = await solve_dependencies(
+                # TODO: Research the async_exit_stack parameter
+                (
+                    solved_values,
+                    errors,
+                    background_tasks,
+                    *_,
+                ) = await solve_dependencies(
                     request=initial_state_request,
                     dependant=dependant,
                     async_exit_stack=stack,
                 )
 
+                if background_tasks is not None:
+                    raise LifespanDependencyError(
+                        "BackgroundTasks are unavailable during startup"
+                    )
+                    # TODO: Throw a similar error for responses
+
                 if len(errors) > 0:
-                    raise ValidationException(errors)
+                    raise LifespanDependencyError(errors)
                     # TODO: Normalize errors (see fastapi.routing:313)
 
                 state[name] = await stack.enter_async_context(
