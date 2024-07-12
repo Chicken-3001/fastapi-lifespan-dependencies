@@ -1,9 +1,11 @@
 [tool.poetry]
 name = "fastapi-lifespan-dependencies"
 version = "0.1.0"
-description = ""
-authors = ["Someone <someone@example.com>"]
+description = "Allows for the creation of lifespan dependencies - FastAPI dependencies that are only run once per app."
+authors = ["Ruvi Kaplan <thepokoranan@gmail.com>"]
 readme = "README.md"
+license = "MIT"
+repository = "https://github.com/Chicken-3001/fastapi-lifespan-dependencies"
 
 [tool.poetry.dependencies]
 python = "^3.12"
