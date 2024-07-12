@@ -1,8 +1,10 @@
 # FastAPI Lifespan Dependencies
 
-Allows for creation of _lifespan dependencies_ - [FastAPI dependencies] that are only run once per app, instead of once per path.
+Allows for the creation of _lifespan dependencies_ -
+[FastAPI dependencies] that are only run once per app, instead of once per path.
 
-This library is inspired by [`fastapi-lifespan-manager`] and by [this suggestion][lifespan dependencies suggestion] on the FastAPI GitHub page.
+This library is inspired by [`fastapi-lifespan-manager`]
+and by [this suggestion][lifespan dependencies suggestion] on the FastAPI GitHub page.
 
 
 ## Usage
@@ -53,6 +55,7 @@ async def delete_example(db: Annotated[Redis, Depends(get_db)]):
     return await db.delete('example')
 ```
 
+
 ## Usage with Other Dependencies
 
 Similarly to normal FastAPI dependencies, lifespan dependencies can depend on each other:
@@ -83,15 +86,17 @@ Lifespan dependencies can also depend on normal dependencies,
 as long as none of them require path-related dependencies
 (like `Query()` or `Body()`).
 
+
 ## When Are Lifespan Dependencies Run?
 
 Every function decorated with `Lifespan.register` will be run when the application
 starts, up until a `yield` statement is encountered.
 Everything past the `yield` will only be executed right before the application shuts down.
 
-This means that unlike normal FastAPI dependencies, using the same dependency
+This means that, unlike normal FastAPI dependencies, using the same dependency
 in multiple path functions won't run the dependency multiple times, and every
 function will share the same instance of the dependency.
+
 
 ## Examples
 

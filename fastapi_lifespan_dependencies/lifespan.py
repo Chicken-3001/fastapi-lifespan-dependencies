@@ -55,7 +55,6 @@ class Lifespan:
                     }
                 )
 
-                # TODO: Research the async_exit_stack parameter
                 (
                     solved_values,
                     errors,
@@ -71,11 +70,9 @@ class Lifespan:
                     raise LifespanDependencyError(
                         "BackgroundTasks are unavailable during startup"
                     )
-                    # TODO: Throw a similar error for responses
 
                 if len(errors) > 0:
                     raise LifespanDependencyError(errors)
-                    # TODO: Normalize errors (see fastapi.routing:313)
 
                 state[name] = await _run_dependency(
                     exit_stack, dependency(**solved_values)
@@ -87,7 +84,6 @@ class Lifespan:
         self, dependency: Callable[..., AsyncIterator[R] | Iterator[R]]
     ) -> Callable[[HTTPConnection], R]:
         if isasyncgenfunction(dependency):
-            # TODO: Make sure this works with objects that define a custom __call__
             context_manager = asynccontextmanager(dependency)
         elif isgeneratorfunction(dependency):
             context_manager = contextmanager(dependency)
@@ -96,10 +92,7 @@ class Lifespan:
 
         self.dependencies[dependency.__name__] = context_manager
 
-        # TODO: figure out why @wraps(dependency) breaks `Depends()` usage
         def path_dependency(connection: HTTPConnection) -> Any:
-            # TODO: Class based dependencies don't have __name__ by default,
-            # so they'll probably break
             return getattr(connection.state, dependency.__name__)
 
         return path_dependency
