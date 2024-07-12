@@ -21,7 +21,6 @@ app = FastAPI(lifespan=lifespan)
 async def get_lifespan_dependency(
     value: Annotated[int, Depends(lifespan_dependency)],
 ) -> int:
-    print(value)
     return value
 
 
